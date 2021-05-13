@@ -1,5 +1,6 @@
 module Main where
 
+import System.IO (BufferMode (NoBuffering), hSetBuffering, stdout)
 import Options.Applicative
 import Myriad
 
@@ -31,5 +32,6 @@ parseArgs = execParser $ info (helper <*> args) (fullDesc <> progDesc "Run the M
 
 main :: IO ()
 main = do
+    hSetBuffering stdout NoBuffering
     Args { configPath, languagesDir } <- parseArgs
     runMyriadServer configPath languagesDir
