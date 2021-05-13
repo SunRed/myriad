@@ -165,14 +165,14 @@ evalCode lang numRetries code = withContainer $ \cnt -> do
             if done
                 -- If we find the eval is done from an exception, then it was timed out.
                 then do
-                    logInfo ["Code timed out in container ", cs cnt, ", evaluation ", cs $ show snowflake]
+                    logDebug ["Code timed out in container ", cs cnt, ", evaluation ", cs $ show snowflake]
                     pure EvalTimedOut
                 -- Otherwise, the container was killed from another eval, so we should retry.
                 else do
                     writeMVar doneRef True
                     if numRetries < fromIntegral (lang ^. #retries)
                         then do
-                            logInfo
+                            logDebug
                                 [ "An exception occured in "
                                 , cs cnt
                                 , ", evaluation "
@@ -182,7 +182,7 @@ evalCode lang numRetries code = withContainer $ \cnt -> do
                                 ]
                             evalCode lang (numRetries + 1) code
                         else do
-                            logInfo
+                            logDebug
                                 [ "An exception occured in "
                                 , cs cnt
                                 , ", evaluation "
@@ -222,7 +222,7 @@ evalCode lang numRetries code = withContainer $ \cnt -> do
 
         eval :: ContainerName -> Snowflake -> Myriad EvalResult
         eval cnt snowflake = do 
-            logInfo ["Running code in container ", cs cnt, ", evaluation ", cs $ show snowflake, ":\n", cs code]
+            logDebug ["Running code in container ", cs cnt, ", evaluation ", cs $ show snowflake, ":\n", cs code]
             exec_ ["docker exec ", cs cnt, " mkdir eval/", show snowflake]
             exec_ ["docker exec ", cs cnt, " chmod 777 eval/", show snowflake]
             -- User 1001 will be used for the actual execution so that they can't access `eval` itself
@@ -239,7 +239,7 @@ evalCode lang numRetries code = withContainer $ \cnt -> do
             logDebug ["Executing with stdin `", cs cmd, "`"]
             output <- readProcessInterleaved_ pr
             exec_ ["docker exec ", cnt, " rm -rf eval/", show snowflake]
-            logInfo ["Ran code in container ", cs cnt, ", evaluation ", cs $ show snowflake]
+            logDebug ["Ran code in container ", cs cnt, ", evaluation ", cs $ show snowflake]
             pure $ EvalOk output
 
 newContainerName :: Language -> Myriad ContainerName

@@ -95,7 +95,7 @@ initEnv configPath languagesDir =
     <*> newSnowflakeGen defaultConfig 0
 
 runMyriadT :: MonadIO m => Env -> MyriadT m a -> m a
-runMyriadT env = runStdoutLoggingT . flip runReaderT env . unMyriadT
+runMyriadT env = runStdoutLoggingT . filterLogger (\_ lvl -> lvl /= LevelDebug) . flip runReaderT env . unMyriadT
 
 exec :: (MonadIO m, MonadLogger m) => [String] -> m BL.ByteString
 exec args = do
