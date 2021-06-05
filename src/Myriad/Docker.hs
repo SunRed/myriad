@@ -83,9 +83,9 @@ startCleanup = do
         timer t = forever $ do
             -- Takes time in microseconds
             threadDelay $ t  * 60000000
-            logInfo ["Starting cleanup of containers"]
+            logDebug ["Starting cleanup of containers"]
             n <- killContainers
-            logInfo ["Cleaned up ", cs $ show n, " containers, next in ", cs $ show t, " minutes"]
+            logDebug ["Cleaned up ", cs $ show n, " containers, next in ", cs $ show t, " minutes"]
             timer t
 
 setupContainer :: Language -> Myriad ContainerName
@@ -152,9 +152,9 @@ killContainer lang = do
 killContainers :: Myriad [ContainerName]
 killContainers = do
     containers <- gview #containers >>= readMVar
-    logInfo ["Starting killing of containers"]
+    logDebug ["Starting killing of containers"]
     xs <- forConcurrently (M.toList containers) $ \(k, v) -> (v,) <$> killContainer k
-    logInfo ["Finished killing of containers"]
+    logDebug ["Finished killing of containers"]
     pure . map fst $ filter snd xs
 
 evalCode :: Language -> Int -> String -> Myriad EvalResult
