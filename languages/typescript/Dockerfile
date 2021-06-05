@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:slim
 LABEL author="1Computer1"
 
 RUN yarn global add typescript @types/node
