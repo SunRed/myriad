@@ -1,12 +1,13 @@
 FROM alpine AS build
 
-COPY bf.cpp .
-RUN apk add --no-cache g++ && \
-    g++ bf.cpp -o bf
+WORKDIR /tmp/bf
+RUN apk add --no-cache musl-dev gcc make git && \
+    git clone https://github.com/rdebath/Brainfuck.git . && \
+    cd tritium && \
+    make
 
 FROM alpine
-LABEL author="1Computer1"
+LABEL author="SunRed"
 
-RUN apk add --no-cache libstdc++
-COPY --from=build bf /usr/local/bin/
+COPY --from=build /tmp/bf/tritium/bfi.out /usr/local/bin/bf
 COPY run.sh /var/run/
